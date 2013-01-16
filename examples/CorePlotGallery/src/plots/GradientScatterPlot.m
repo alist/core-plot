@@ -46,7 +46,9 @@
         NSMutableArray *contentArray = [NSMutableArray arrayWithCapacity:100];
         for ( NSUInteger i = 0; i < 10; i++ ) {
             id x = [NSDecimalNumber numberWithDouble:1.0 + i * 0.05];
-            id y = [NSDecimalNumber numberWithDouble:1.2 * rand() / (double)RAND_MAX + 0.5];
+            double yVal = 1.2 * rand() / (double)RAND_MAX + 0.5;
+            yVal = MAX(0, yVal);
+            id y = [NSDecimalNumber numberWithDouble:yVal];
             [contentArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:x, @"x", y, @"y", nil]];
         }
         plotData = [contentArray retain];
@@ -74,11 +76,11 @@
     plotSpace.delegate              = self;
 
     // Grid line styles
-    CPTMutableLineStyle *majorGridLineStyle = [CPTMutableLineStyle lineStyle];
+    CPTMutableLineStyle *majorGridLineStyle = nil;//[CPTMutableLineStyle lineStyle];
     majorGridLineStyle.lineWidth = 0.75;
     majorGridLineStyle.lineColor = [[CPTColor colorWithGenericGray:0.2] colorWithAlphaComponent:0.75];
 
-    CPTMutableLineStyle *minorGridLineStyle = [CPTMutableLineStyle lineStyle];
+    CPTMutableLineStyle *minorGridLineStyle = nil;// [CPTMutableLineStyle lineStyle];
     minorGridLineStyle.lineWidth = 0.25;
     minorGridLineStyle.lineColor = [[CPTColor whiteColor] colorWithAlphaComponent:0.1];
 
@@ -92,49 +94,55 @@
     x.majorGridLineStyle          = majorGridLineStyle;
     x.minorGridLineStyle          = minorGridLineStyle;
 
-    x.title         = @"X Axis";
-    x.titleOffset   = 30.0;
-    x.titleLocation = CPTDecimalFromString(@"1.25");
+//    x.title         = @"X Axis";
+//    x.titleOffset   = 30.0;
+//    x.titleLocation = CPTDecimalFromString(@"1.25");
 
     // Label y with an automatic label policy.
     CPTXYAxis *y = axisSet.yAxis;
-    y.labelingPolicy              = CPTAxisLabelingPolicyAutomatic;
-    y.orthogonalCoordinateDecimal = CPTDecimalFromString(@"1.0");
-    y.minorTicksPerInterval       = 2;
-    y.preferredNumberOfMajorTicks = 8;
-    y.majorGridLineStyle          = majorGridLineStyle;
-    y.minorGridLineStyle          = minorGridLineStyle;
-    y.labelOffset                 = 10.0;
+    y.axisConstraints = [CPTConstraints constraintWithLowerOffset:0.0];
 
-    y.title         = @"Y Axis";
-    y.titleOffset   = 30.0;
-    y.titleLocation = CPTDecimalFromString(@"1.0");
+//    y.labelingPolicy              = CPTAxisLabelingPolicyAutomatic;
+//    y.orthogonalCoordinateDecimal = CPTDecimalFromString(@"1.0");
+//    y.minorTicksPerInterval       = 2;
+//    y.preferredNumberOfMajorTicks = 8;
+//    y.majorGridLineStyle          = majorGridLineStyle;
+//    y.minorGridLineStyle          = minorGridLineStyle;
+//    y.labelOffset                 = 10.0;
+
+//    y.title         = @"Y Axis";
+//    y.titleOffset   = 30.0;
+//    y.titleLocation = CPTDecimalFromString(@"1.0");
 
     // Create a plot that uses the data source method
     CPTScatterPlot *dataSourceLinePlot = [[[CPTScatterPlot alloc] init] autorelease];
     dataSourceLinePlot.identifier = @"Data Source Plot";
+    
 
     CPTMutableLineStyle *lineStyle = [[dataSourceLinePlot.dataLineStyle mutableCopy] autorelease];
-    lineStyle.lineWidth              = 3.0;
-    lineStyle.lineColor              = [CPTColor greenColor];
+    lineStyle.lineWidth              = 0.0;
+    lineStyle.lineColor              = nil;//[CPTColor greenColor];
+    dataSourceLinePlot.interpolation = CPTScatterPlotInterpolationCurved;
     dataSourceLinePlot.dataLineStyle = lineStyle;
     dataSourceLinePlot.dataSource    = self;
     [graph addPlot:dataSourceLinePlot];
 
     // Put an area gradient under the plot above
-    CPTColor *areaColor       = [CPTColor colorWithComponentRed:0.3 green:1.0 blue:0.3 alpha:0.8];
-    CPTGradient *areaGradient = [CPTGradient gradientWithBeginningColor:areaColor endingColor:[CPTColor clearColor]];
+    CPTColor *areaColor       = [CPTColor colorWithComponentRed:0.9 green:.1 blue:0.2 alpha:.8];
+    CPTColor *endColor        = [CPTColor colorWithComponentRed:.9 green:.1 blue:0.3 alpha:.5];
+    CPTGradient *areaGradient = [CPTGradient gradientWithBeginningColor:areaColor endingColor:endColor];
+//    areaGradient = [CPTGradient gradientWithBeginningColor:areaColor endingColor:endColor beginningPosition:0 endingPosition:1];
     areaGradient.angle = -90.0;
     CPTFill *areaGradientFill = [CPTFill fillWithGradient:areaGradient];
     dataSourceLinePlot.areaFill      = areaGradientFill;
-    dataSourceLinePlot.areaBaseValue = CPTDecimalFromString(@"0.0");
+    dataSourceLinePlot.areaBaseValue = CPTDecimalFromString(@".1");
 
     // Auto scale the plot space to fit the plot data
     // Extend the ranges by 30% for neatness
     [plotSpace scaleToFitPlots:[NSArray arrayWithObjects:dataSourceLinePlot, nil]];
     CPTMutablePlotRange *xRange = [[plotSpace.xRange mutableCopy] autorelease];
     CPTMutablePlotRange *yRange = [[plotSpace.yRange mutableCopy] autorelease];
-    [xRange expandRangeByFactor:CPTDecimalFromDouble(1.3)];
+    [xRange expandRangeByFactor:CPTDecimalFromDouble(1.0)];
     [yRange expandRangeByFactor:CPTDecimalFromDouble(1.3)];
     plotSpace.xRange = xRange;
     plotSpace.yRange = yRange;
@@ -146,17 +154,17 @@
 
     // Add plot symbols
     CPTMutableLineStyle *symbolLineStyle = [CPTMutableLineStyle lineStyle];
-    symbolLineStyle.lineColor = [CPTColor blackColor];
+    symbolLineStyle.lineColor = [CPTColor clearColor];
     CPTPlotSymbol *plotSymbol = [CPTPlotSymbol ellipsePlotSymbol];
-    plotSymbol.fill               = [CPTFill fillWithColor:[CPTColor blueColor]];
+    plotSymbol.fill               = [CPTFill fillWithColor:[CPTColor colorWithCGColor:[[UIColor colorWithWhite:.9 alpha:1] CGColor]]];
     plotSymbol.lineStyle          = symbolLineStyle;
-    plotSymbol.size               = CGSizeMake(10.0, 10.0);
+    plotSymbol.size               = CGSizeMake(7.0, 7.0);
     dataSourceLinePlot.plotSymbol = plotSymbol;
 
     // Set plot delegate, to know when symbols have been touched
     // We will display an annotation when a symbol is touched
     dataSourceLinePlot.delegate                        = self;
-    dataSourceLinePlot.plotSymbolMarginForHitDetection = 5.0f;
+    dataSourceLinePlot.plotSymbolMarginForHitDetection = 15.0f;
 }
 
 -(void)dealloc
@@ -197,6 +205,8 @@
         [changedRange shiftEndToFitInRange:maxRange];
         [changedRange shiftLocationToFitInRange:maxRange];
         newRange = changedRange;
+    }else if ( coordinate == CPTCoordinateY ){
+        newRange = ((CPTXYPlotSpace *)space).yRange;
     }
     return newRange;
 }
