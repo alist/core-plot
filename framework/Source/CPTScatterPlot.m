@@ -1119,6 +1119,11 @@ NSString *const CPTScatterPlotBindingPlotSymbols = @"plotSymbols"; ///< Plot sym
     return [super pointingDeviceDownEvent:event atPoint:interactionPoint];
 }
 
+-(BOOL)pointingDeviceDraggedEvent:(UIEvent *)event atPoint:(CGPoint)interactionPoint{
+    
+    return ([self pointingDeviceDownEvent:event atPoint:interactionPoint]);
+}
+
 /// @}
 
 #pragma mark -

@@ -76,11 +76,11 @@
     plotSpace.delegate              = self;
 
     // Grid line styles
-    CPTMutableLineStyle *majorGridLineStyle = nil;//[CPTMutableLineStyle lineStyle];
+    CPTMutableLineStyle *majorGridLineStyle = [CPTMutableLineStyle lineStyle];
     majorGridLineStyle.lineWidth = 0.75;
     majorGridLineStyle.lineColor = [[CPTColor colorWithGenericGray:0.2] colorWithAlphaComponent:0.75];
 
-    CPTMutableLineStyle *minorGridLineStyle = nil;// [CPTMutableLineStyle lineStyle];
+    CPTMutableLineStyle *minorGridLineStyle = [CPTMutableLineStyle lineStyle];
     minorGridLineStyle.lineWidth = 0.25;
     minorGridLineStyle.lineColor = [[CPTColor whiteColor] colorWithAlphaComponent:0.1];
 
@@ -93,6 +93,7 @@
     x.minorTicksPerInterval       = 2;
     x.majorGridLineStyle          = majorGridLineStyle;
     x.minorGridLineStyle          = minorGridLineStyle;
+    x.
 
 //    x.title         = @"X Axis";
 //    x.titleOffset   = 30.0;
@@ -102,13 +103,13 @@
     CPTXYAxis *y = axisSet.yAxis;
     y.axisConstraints = [CPTConstraints constraintWithLowerOffset:0.0];
 
-//    y.labelingPolicy              = CPTAxisLabelingPolicyAutomatic;
-//    y.orthogonalCoordinateDecimal = CPTDecimalFromString(@"1.0");
-//    y.minorTicksPerInterval       = 2;
-//    y.preferredNumberOfMajorTicks = 8;
-//    y.majorGridLineStyle          = majorGridLineStyle;
-//    y.minorGridLineStyle          = minorGridLineStyle;
-//    y.labelOffset                 = 10.0;
+    y.labelingPolicy              = CPTAxisLabelingPolicyAutomatic;
+    y.orthogonalCoordinateDecimal = CPTDecimalFromString(@"1.0");
+    y.minorTicksPerInterval       = 2;
+    y.preferredNumberOfMajorTicks = 8;
+    y.majorGridLineStyle          = majorGridLineStyle;
+    y.minorGridLineStyle          = minorGridLineStyle;
+    y.labelOffset                 = 10.0;
 
 //    y.title         = @"Y Axis";
 //    y.titleOffset   = 30.0;
@@ -222,7 +223,13 @@
         [graph.plotAreaFrame.plotArea removeAnnotation:symbolTextAnnotation];
         symbolTextAnnotation = nil;
     }
-
+    
+    CPTPlotSymbol * symbol = [plot plotSymbolForRecordIndex:index];
+    CPTMutableLineStyle *selectedSymbolLineStyle = [CPTMutableLineStyle lineStyle];
+    selectedSymbolLineStyle.lineColor = [CPTColor lightGrayColor];
+//    [symbol setLineStyle:selectedSymbolLineStyle];
+    [symbol setFill:[CPTFill fillWithColor:[CPTColor lightGrayColor]]];
+    
     // Setup a style for the annotation
     CPTMutableTextStyle *hitAnnotationTextStyle = [CPTMutableTextStyle textStyle];
     hitAnnotationTextStyle.color    = [CPTColor whiteColor];

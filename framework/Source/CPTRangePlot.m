@@ -1051,6 +1051,38 @@ typedef struct CGPointError CGPointError;
     return [super pointingDeviceDownEvent:event atPoint:interactionPoint];
 }
 
+
+
+-(BOOL)pointingDeviceDraggedEvent:(CPTNativeEvent *)event atPoint:(CGPoint)interactionPoint
+{
+    CPTGraph *theGraph       = self.graph;
+    CPTPlotArea *thePlotArea = self.plotArea;
+    
+    if ( !theGraph || !thePlotArea || self.hidden ) {
+        return NO;
+    }
+    
+    id<CPTRangePlotDelegate> theDelegate = self.delegate;
+    if ( [theDelegate respondsToSelector:@selector(rangePlot:rangeWasSelectedAtRecordIndex:)] ||
+        [theDelegate respondsToSelector:@selector(rangePlot:rangeWasSelectedAtRecordIndex:withEvent:)] ) {
+        // Inform delegate if a point was hit
+        CGPoint plotAreaPoint = [theGraph convertPoint:interactionPoint toLayer:thePlotArea];
+        NSUInteger idx        = [self dataIndexFromInteractionPoint:plotAreaPoint];
+        
+        if ( idx != NSNotFound ) {
+            if ( [theDelegate respondsToSelector:@selector(rangePlot:rangeWasSelectedAtRecordIndex:)] ) {
+                [theDelegate rangePlot:self rangeWasSelectedAtRecordIndex:idx];
+            }
+            if ( [theDelegate respondsToSelector:@selector(rangePlot:rangeWasSelectedAtRecordIndex:withEvent:)] ) {
+                [theDelegate rangePlot:self rangeWasSelectedAtRecordIndex:idx withEvent:event];
+            }
+            return YES;
+        }
+    }
+    
+    return [super pointingDeviceDraggedEvent:event atPoint:interactionPoint];
+}
+
 /// @}
 
 #pragma mark -
