@@ -1081,6 +1081,8 @@ NSString *const CPTScatterPlotBindingPlotSymbols = @"plotSymbols"; ///< Plot sym
     if ( !theGraph || !thePlotArea || self.hidden ) {
         return NO;
     }
+    
+    self.lastInteractionPoint = interactionPoint;
 
     id<CPTScatterPlotDelegate> theDelegate = self.delegate;
     if ( [theDelegate respondsToSelector:@selector(scatterPlot:plotSymbolWasSelectedAtRecordIndex:)] ||

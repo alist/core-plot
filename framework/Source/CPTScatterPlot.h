@@ -140,6 +140,7 @@ CPTScatterPlotInterpolation;
 /// @name User Interaction
 /// @{
 @property (nonatomic, readwrite, assign) CGFloat plotSymbolMarginForHitDetection;
+@property (nonatomic, assign) CGPoint lastInteractionPoint;
 /// @}
 
 /// @name Visible Points
